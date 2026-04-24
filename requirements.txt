@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-multipart
+dbos
+deepface
+mediapipe
+tf-keras
+opencv-python
+psycopg2-binary
+pgvector
+numpy
