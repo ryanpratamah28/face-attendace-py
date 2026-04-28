@@ -79,3 +79,20 @@ def step_log_attendance(user_id: int, status: str, message: str) -> None:
         )
     conn.commit()
     conn.close()
+
+
+@DBOS.step()
+def step_list_users() -> list:
+    conn = get_connection()
+    users = []
+    with conn.cursor() as cur:
+        cur.execute("SELECT id, name, created_at FROM users ORDER BY created_at DESC;")
+        rows = cur.fetchall()
+        for row in rows:
+            users.append({
+                "id": row[0],
+                "name": row[1],
+                "created_at": row[2]
+            })
+    conn.close()
+    return users

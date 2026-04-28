@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from typing import Any, Optional
+from typing import Any, List, Optional
+from datetime import datetime
 
 
 # ─────────────────────────────────────────────
@@ -34,3 +35,18 @@ class WorkflowResult(BaseModel):
     user: Optional[str] = None
     user_id: Optional[int] = None
     name: Optional[str] = None
+
+
+# ─────────────────────────────────────────────
+# Users List Models
+# ─────────────────────────────────────────────
+
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    created_at: datetime
+
+
+class UserListResponse(BaseModel):
+    total: int
+    users: List[UserResponse]

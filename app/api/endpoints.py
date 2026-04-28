@@ -1,13 +1,22 @@
 import os
 import shutil
 from fastapi import FastAPI, File, UploadFile, Form
+from fastapi.middleware.cors import CORSMiddleware
 from dbos import DBOS
 
 from app.core.config import UPLOAD_DIR, DEFAULT_DETECTOR_BACKEND
-from app.domain.models import JobStartedResponse, JobStatusResponse
+from app.domain.models import JobStartedResponse, JobStatusResponse, UserListResponse
 from app.workflows import attendance
-
+from app.operations.database import step_list_users
 app = FastAPI(title="Face Attendance API with DBOS")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -59,8 +68,6 @@ async def get_job_status(job_id: str):
     if not status:
         return JobStatusResponse(status="NOT_FOUND", error="Job not found")
 
-    print("status is: ", status.status)
-
     response = JobStatusResponse(status=status.status)
 
     if status.status == "SUCCESS":
@@ -68,4 +75,17 @@ async def get_job_status(job_id: str):
         response.result = await handle.get_result()
 
     return response
-    
+
+
+# ─────────────────────────────────────────────
+# Users Management
+# ─────────────────────────────────────────────
+
+@app.get("/face-users", response_model=UserListResponse)
+async def list_users():
+    users_data = step_list_users()
+
+    return UserListResponse(
+        total=len(users_data),
+        users=users_data
+    )
